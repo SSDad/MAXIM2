@@ -9,42 +9,46 @@ iDate = find(junk, 1);
 
 fd_Date = data.ImgInfo.fd_allDates(iDate);
 ImageFileFolder = fullfile(data.ImgInfo.ImageDataPath, fd_Date.name);
-ImageFileName = fullfile(ImageFileFolder, 'image.mat');
+ImageMMName = fullfile(ImageFileFolder, 'imageMM.mat');
+ImageInfoName = fullfile(ImageFileFolder, 'imageInfo.mat');
 
-if exist(ImageFileName, 'file')
-    load(ImageFileName)
+if exist(ImageMMName, 'file')
+    load(ImageMMName)
+    load(ImageInfoName)
 else
     fd = fullfile(fd_Date.folder, fd_Date.name);
     junk = dir(fd);
     allFiles  = junk(~[junk.isdir]);
     names = {allFiles.name}';
-    image = LoadDICOMImages(fd, names);
+    [MM, Info] = fun_readDICOMCT(fd, names);
     
     if ~exist(ImageFileFolder, 'dir')
         mkdir(ImageFileFolder);
     end
-    save(ImageFileName, 'image');
+    save(ImageMMName, 'MM');
+    save(ImageInfoName, 'Info');
 end
-    
+image.MM = MM;
+image.Info = Info;
 data.image = image;
 guidata(hFig, data);
 
 
 % CT images
-M = image.dimensions(1);
-N = image.dimensions(2);
-P = image.dimensions(3);
+M = image.Info.dimensions(1);
+N = image.Info.dimensions(2);
+P = image.Info.dimensions(3);
 iP = round(P/2);
-I = image.data(:,:,iP);
+I = image.MM(:,:,iP);
 data.image.AxialView.iP = iP;
 
-x0 = image.start(1);
-y0 = image.start(2);
-z0 = image.start(3);
+x0 = image.Info.xyz0(1);
+y0 = image.Info.xyz0(2);
+z0 = image.Info.xyz0(3);
 
-dx = image.width(1);
-dy = image.width(2);
-dz = image.width(3);
+dx = image.Info.dd(1);
+dy = image.Info.dd(2);
+dz = image.Info.dd(3);
 
 xWL(1) = x0-dx/2;
 xWL(2) = xWL(1)+dx*N;

@@ -9,21 +9,24 @@ iDate = find(junk, 1);
 
 fd_Date = data.ImgInfo.fd_allDates(iDate);
 ImageFileFolder = fullfile(data.ImgInfo.ImageDataPath, fd_Date.name);
-ImageFileName = fullfile(ImageFileFolder, 'image.mat');
+ImageMMName = fullfile(ImageFileFolder, 'imageMM.mat');
+ImageInfoName = fullfile(ImageFileFolder, 'imageInfo.mat');
 
-if exist(ImageFileName, 'file')
-    load(ImageFileName)
+if exist(ImageMMName, 'file')
+    load(ImageMMName)
+    load(ImageInfoName)
 else
     fd = fullfile(fd_Date.folder, fd_Date.name);
     junk = dir(fd);
     allFiles  = junk(~[junk.isdir]);
     names = {allFiles.name}';
-    image = LoadDICOMImages(fd, names);
+    image = fun_readDICOMCT(fd, names);
     
     if ~exist(ImageFileFolder, 'dir')
         mkdir(ImageFileFolder);
     end
-    save(ImageFileName, 'image');
+    save(ImageMMName, 'image.MM');
+    save(ImageInfoName, 'image.Info');
 end
     
 data.image = image;
@@ -31,11 +34,12 @@ guidata(hFig, data);
 
 
 % CT images
-M = image.dimensions(1);
-N = image.dimensions(2);
-P = image.dimensions(3);
+M = image.Info.dimensions(1);
+N = image.Info.dimensions(2);
+P = image.Info.dimensions(3);
 iP = round(P/2);
 I = image.data(:,:,iP);
+data.image.AxialView.iP = iP;
 
 x0 = image.start(1);
 y0 = image.start(2);
@@ -55,9 +59,10 @@ zWL(2) = zWL(1)+dz*P;
 RA = imref2d([M N], xWL, yWL);
 data.image.AxialView.RA = RA;
 
-    hA = data.Panel.View.Comp.hAxis.Image;
-    hPlotObj.Image = imshow(I, RA, 'parent', hA);
-    axis(data.Panel.View.Comp.hAxis.Image, 'tight', 'equal')
+hA = data.Panel.AxialView.Comp.hAxis.Image;
+cla(hA);
+hPlotObj.Image = imshow(I, RA, 'DisplayRange',[], 'parent', hA);
+axis(hA, 'tight', 'equal')
 
 % 
 % %% load image data
