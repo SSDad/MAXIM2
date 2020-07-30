@@ -34,13 +34,13 @@ data.image = image;
 guidata(hFig, data);
 
 
-% CT images
+%% CT images
 M = image.Info.dimensions(1);
 N = image.Info.dimensions(2);
 P = image.Info.dimensions(3);
+iM = round(M/2);
+iN = round(N/2);
 iP = round(P/2);
-I = image.MM(:,:,iP);
-data.image.AxialView.iP = iP;
 
 x0 = image.Info.xyz0(1);
 y0 = image.Info.xyz0(2);
@@ -57,13 +57,52 @@ yWL(2) = yWL(1)+dy*M;
 zWL(1) = z0-dz/2;
 zWL(2) = zWL(1)+dz*P;
 
-RA = imref2d([M N], xWL, yWL);
+%% Axial
+IA = image.MM(:,:,iP);
+data.image.AxialView.iP = iP;
+
+RA = imref2d([M N], yWL, xWL);
 data.image.AxialView.RA = RA;
 
 hA = data.Panel.AxialView.Comp.hAxis.Image;
 cla(hA);
-hPlotObj.Image = imshow(I, RA, 'DisplayRange',[], 'parent', hA);
+hPlotObj.IA = imshow(IA, RA, 'DisplayRange',[], 'parent', hA);
 axis(hA, 'tight', 'equal')
+
+%% Sagital
+IS = rot90(squeeze(image.MM(:,iN, :)));
+data.image.SagitalView.iN = iN;
+
+% RA = imref2d([P M], xWL, flip(zWL));
+% data.image.SagitalView.RA = RA;
+
+hA = data.Panel.SagitalView.Comp.hAxis.Image;
+cla(hA);
+% h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
+hPlotObj.IS = imshow(IS, 'DisplayRange',[], 'parent', hA);
+hPlotObj.IS.XData = image.Info.xx;
+hPlotObj.IS.YData = image.Info.zz;
+
+hA.YDir = 'normal';
+hA.Visible = 'on';
+axis(hA, 'tight', 'equal')
+
+%% Coronal
+IC =rot90(squeeze(image.MM(iM, :, :)));
+data.image.CoronalView.iM = iM;
+
+hA = data.Panel.CoronalView.Comp.hAxis.Image;
+cla(hA);
+% h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
+hPlotObj.IC = imshow(IC, 'DisplayRange',[], 'parent', hA);
+hPlotObj.IC.XData = image.Info.yy;
+hPlotObj.IC.YData = image.Info.zz;
+
+hA.YDir = 'normal';
+hA.Visible = 'on';
+axis(hA, 'tight', 'equal')
+
+
 
 % 
 % %% load image data

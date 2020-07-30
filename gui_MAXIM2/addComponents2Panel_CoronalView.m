@@ -1,4 +1,4 @@
-function Comp = addComponents2Panel_AxialView(hPanel)
+function Comp = addComponents2Panel_CoronalView(hPanel)
 
 FC = [255 255 102]/255;
 
@@ -10,9 +10,9 @@ Comp.hAxis.Image = axes('Parent',                   hPanel, ...
                             'gridcolor',   FC,...
                             'Units',                    'normalized', ...
                             'HandleVisibility',     'callback', ...
-                            'Position',                 [0.05 0.0 0.9 0.9]);
+                            'Position',                 [0.05 0.1 0.9 0.9]);
 
-Comp.hAxis.Image.XAxisLocation='top';
-Comp.hAxis.Image.XLabel.String = 'y';
-Comp.hAxis.Image.YLabel.String = 'x';
+% Comp.hAxis.Image.XAxisLocation='top';
+Comp.hAxis.Image.XLabel.String = 'x';
+Comp.hAxis.Image.YLabel.String = 'z';
 hold(Comp.hAxis.Image, 'on')

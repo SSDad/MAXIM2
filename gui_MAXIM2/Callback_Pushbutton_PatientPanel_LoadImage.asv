@@ -20,34 +20,35 @@ else
     junk = dir(fd);
     allFiles  = junk(~[junk.isdir]);
     names = {allFiles.name}';
-    image = fun_readDICOMCT(fd, names);
+    [MM, Info] = fun_readDICOMCT(fd, names);
     
     if ~exist(ImageFileFolder, 'dir')
         mkdir(ImageFileFolder);
     end
-    save(ImageMMName, 'image.MM');
-    save(ImageInfoName, 'image.Info');
+    save(ImageMMName, 'MM');
+    save(ImageInfoName, 'Info');
 end
-    
+image.MM = MM;
+image.Info = Info;
 data.image = image;
 guidata(hFig, data);
 
 
-% CT images
+%% CT images
 M = image.Info.dimensions(1);
 N = image.Info.dimensions(2);
 P = image.Info.dimensions(3);
+iM = round(M/2);
+iN = round(N/2);
 iP = round(P/2);
-I = image.data(:,:,iP);
-data.image.AxialView.iP = iP;
 
-x0 = image.start(1);
-y0 = image.start(2);
-z0 = image.start(3);
+x0 = image.Info.xyz0(1);
+y0 = image.Info.xyz0(2);
+z0 = image.Info.xyz0(3);
 
-dx = image.width(1);
-dy = image.width(2);
-dz = image.width(3);
+dx = image.Info.dd(1);
+dy = image.Info.dd(2);
+dz = image.Info.dd(3);
 
 xWL(1) = x0-dx/2;
 xWL(2) = xWL(1)+dx*N;
@@ -56,14 +57,31 @@ yWL(2) = yWL(1)+dy*M;
 zWL(1) = z0-dz/2;
 zWL(2) = zWL(1)+dz*P;
 
-RA = imref2d([M N], xWL, yWL);
+%% Axial
+IA = image.MM(:,:,iP);
+data.image.AxialView.iP = iP;
+
+RA = imref2d([M N], yWL, xWL);
 data.image.AxialView.RA = RA;
 
 hA = data.Panel.AxialView.Comp.hAxis.Image;
 cla(hA);
-hPlotObj.Image = imshow(I, RA, 'DisplayRange',[], 'parent', hA);
+hPlotObj.Image = imshow(IA, RA, 'DisplayRange',[], 'parent', hA);
 axis(hA, 'tight', 'equal')
 
+%% Sagital
+IS = rot90(squeeze(image.MM(:,iN, :)));
+data.image.SagitalView.iN = iN;
+
+RA = imref2d([P M], xWL, flip(zWL));
+data.image.SagitalView.RA = RA;
+
+hA = data.Panel.SagitalView.Comp.hAxis.Image;
+cla(hA);
+% h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
+h = imshow(IS, 'DisplayRange',[], 'parent', hA);
+h.XData = 
+axis(hA, 'tight', 'equal')
 % 
 % %% load image data
 % td = tempdir;
