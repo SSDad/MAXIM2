@@ -6,7 +6,8 @@ data = guidata(hFig);
 dateTableData = data.Panel.Patient.Comp.Table.Date.Data;
 junk = cell2mat(dateTableData(:, 1));
 iDate = find(junk, 1);
-
+modality = data.Panel.Patient.Comp.Table.Date.Data{iDate, 3};
+ 
 fd_Date = data.ImgInfo.fd_allDates(iDate);
 ImageFileFolder = fullfile(data.ImgInfo.ImageDataPath, fd_Date.name);
 ImageMMName = fullfile(ImageFileFolder, 'imageMM.mat');
@@ -20,7 +21,12 @@ else
     junk = dir(fd);
     allFiles  = junk(~[junk.isdir]);
     names = {allFiles.name}';
-    [MM, Info] = fun_readDICOMCT(fd, names);
+    
+    if strcmp(modality, 'CT')
+        [MM, Info] = fun_readDICOMCT(fd, names);
+    else
+        [MM, Info] = fun_readDICOMCT(fd, names);
+    end
     
     if ~exist(ImageFileFolder, 'dir')
         mkdir(ImageFileFolder);
@@ -61,13 +67,32 @@ zWL(2) = zWL(1)+dz*P;
 IA = image.MM(:,:,iP);
 data.image.AxialView.iP = iP;
 
-RA = imref2d([M N], yWL, xWL);
-data.image.AxialView.RA = RA;
+% RA = imref2d([M N], yWL, xWL);
+% data.image.AxialView.RA = RA;
 
-hA = data.Panel.AxialView.Comp.hAxis.Image;
-cla(hA);
-hPlotObj.IA = imshow(IA, RA, 'DisplayRange',[], 'parent', hA);
-axis(hA, 'tight', 'equal')
+% hAA = data.Panel.AxialView.Comp.hAxis.Image;
+% cla(hAA);
+% hPlotObj.IA = imshow(IA, RA, 'DisplayRange',[], 'parent', hAA);
+% axis(hAA, 'tight', 'equal')
+
+hIA = data.Panel.AxialView.Comp.hPlotObj.IA;
+hIA.CData = IA;
+hIA.XData = image.Info.xx;
+hIA.YData = image.Info.yy;
+
+data.Panel.AxialView.Comp.hPlotObj.xLine.Position = [image.Info.xx(iN) image.Info.yy(1)
+                                                                            image.Info.xx(iN) image.Info.yy(end)];
+
+data.Panel.AxialView.Comp.hPlotObj.yLine.Position = [image.Info.xx(1) image.Info.yy(iM)
+                                                                            image.Info.xx(end) image.Info.yy(iM)];
+
+hAA = data.Panel.AxialView.Comp.hAxis.Image;
+hAA.CLim = [min(IA(:)) max(IA(:))];
+hAA.XColor = 'r';
+hAA.YColor = 'g';
+
+axis(hAA, 'tight', 'equal')
+hAA.Visible = 'on';
 
 %% Sagital
 IS = rot90(squeeze(image.MM(:,iN, :)));
@@ -75,32 +100,56 @@ data.image.SagitalView.iN = iN;
 
 % RA = imref2d([P M], xWL, flip(zWL));
 % data.image.SagitalView.RA = RA;
-
-hA = data.Panel.SagitalView.Comp.hAxis.Image;
-cla(hA);
+% hAS = data.Panel.SagitalView.Comp.hAxis.Image;
+% cla(hAS);
 % h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
-hPlotObj.IS = imshow(IS, 'DisplayRange',[], 'parent', hA);
-hPlotObj.IS.XData = image.Info.xx;
-hPlotObj.IS.YData = image.Info.zz;
 
-hA.YDir = 'normal';
-hA.Visible = 'on';
-axis(hA, 'tight', 'equal')
+hIS = data.Panel.SagitalView.Comp.hPlotObj.IS;
+hIS.CData = IS;
+
+% hPlotObj.IS = imshow(IS, 'DisplayRange',[], 'parent', hAS);
+hIS.XData = image.Info.yy;
+hIS.YData = image.Info.zz;
+
+data.Panel.SagitalView.Comp.hPlotObj.zLine.Position = [image.Info.yy(1) image.Info.zz(iP)
+                                                                            image.Info.yy(end) image.Info.zz(iP)];
+data.Panel.SagitalView.Comp.hPlotObj.yLine.Position = [image.Info.yy(iM) image.Info.zz(1)
+                                                                            image.Info.yy(iM) image.Info.zz(end)];
+                
+hAS = data.Panel.SagitalView.Comp.hAxis.Image;
+hAS.CLim = [min(IS(:)) max(IS(:))];
+hAS.XColor = 'g';
+hAS.YColor = 'b';
+hAS.YDir = 'normal';
+hAS.Visible = 'on';
+
+axis(hAS, 'tight', 'equal')
 
 %% Coronal
 IC =rot90(squeeze(image.MM(iM, :, :)));
 data.image.CoronalView.iM = iM;
 
-hA = data.Panel.CoronalView.Comp.hAxis.Image;
-cla(hA);
+% cla(hAC);
 % h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
-hPlotObj.IC = imshow(IC, 'DisplayRange',[], 'parent', hA);
-hPlotObj.IC.XData = image.Info.yy;
-hPlotObj.IC.YData = image.Info.zz;
 
-hA.YDir = 'normal';
-hA.Visible = 'on';
-axis(hA, 'tight', 'equal')
+hIC = data.Panel.CoronalView.Comp.hPlotObj.IC;
+hIC.CData = IC;
+hIC.XData = image.Info.xx;
+hIC.YData = image.Info.zz;
+
+data.Panel.CoronalView.Comp.hPlotObj.zLine.Position = [image.Info.xx(1) image.Info.zz(iP)
+                                                                            image.Info.xx(end) image.Info.zz(iP)];
+
+data.Panel.CoronalView.Comp.hPlotObj.xLine.Position = [image.Info.xx(iN) image.Info.zz(1)
+                                                                            image.Info.xx(iN) image.Info.zz(end)];
+
+hAC = data.Panel.CoronalView.Comp.hAxis.Image;
+hAC.CLim = [min(IC(:)) max(IC(:))];
+hAC.XColor = 'r';
+hAC.YColor = 'b';
+hAC.YDir = 'normal';
+hAC.Visible = 'on';
+axis(hAC, 'tight', 'equal')
 
 
 
