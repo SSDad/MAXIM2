@@ -7,7 +7,9 @@ data = guidata(hFig);
 y = src.Position(1, 1);
 [~, iM] = min(abs(y-data.image.Info.yy));
 hIC = data.Panel.CoronalView.Comp.hPlotObj.IC;
-hIC.CData = rot90(squeeze(data.image.MM(iM, :, :)));
+% hIC.CData = rot90(squeeze(data.image.MM(iM, :, :)));
+hIC.CData =flip(rot90(squeeze(data.image.MM(iM, :, :)), 3), 2);
+
 
 %% sync
 src.Position(:, 2) = evnt.PreviousPosition(:, 2);

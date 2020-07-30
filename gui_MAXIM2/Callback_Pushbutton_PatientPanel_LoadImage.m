@@ -95,7 +95,8 @@ axis(hAA, 'tight', 'equal')
 hAA.Visible = 'on';
 
 %% Sagital
-IS = rot90(squeeze(image.MM(:,iN, :)));
+IMP = squeeze(image.MM(:,iN, :));
+IS = flip(rot90(IMP, 3), 2);
 data.image.SagitalView.iN = iN;
 
 % RA = imref2d([P M], xWL, flip(zWL));
@@ -126,7 +127,8 @@ hAS.Visible = 'on';
 axis(hAS, 'tight', 'equal')
 
 %% Coronal
-IC =rot90(squeeze(image.MM(iM, :, :)));
+INP = squeeze(image.MM(iM, :, :));
+IC =flip(rot90(INP, 3), 2);
 data.image.CoronalView.iM = iM;
 
 % cla(hAC);
