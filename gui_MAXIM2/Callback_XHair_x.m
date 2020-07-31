@@ -7,7 +7,7 @@ data = guidata(hFig);
 x = src.Position(1, 1);
 [~, iN] = min(abs(x-data.image.Info.xx));
 hIS = data.Panel.SagitalView.Comp.hPlotObj.IS;
-hIS.CData = flip(rot90(squeeze(data.image.MM(:, iN, :)), 3), 2);
+hIS.CData = rot90(squeeze(data.image.MM(:, iN, :)));
 
 %% sync
 src.Position(:, 2) = evnt.PreviousPosition(:, 2);

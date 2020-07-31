@@ -30,11 +30,11 @@ waitbar(1, hWB, 'Bingo!');
     Info.yy = y0:dy:y0+dy*(nColumns-1);
     
     z = IPP(3, :);
-    [zz idx] = sort(z, 'descend');
+    [zz, ind] = sort(z);
     z0 = zz(1);
     dz = zz(2)-zz(1);
-    MM = M(:, :, idx);
-    SOPI_UID = SOPI_UID(idx);
+    MM = M(:, :, ind);
+    SOPI_UID = SOPI_UID(ind);
     
     Info.dimensions = [nRows nColumns length(zz)];
     Info.zz = zz;

@@ -96,21 +96,14 @@ hAA.Visible = 'on';
 
 %% Sagital
 IMP = squeeze(image.MM(:,iN, :));
-IS = flip(rot90(IMP, 3), 2);
+IS = rot90(IMP);
 data.image.SagitalView.iN = iN;
-
-% RA = imref2d([P M], xWL, flip(zWL));
-% data.image.SagitalView.RA = RA;
-% hAS = data.Panel.SagitalView.Comp.hAxis.Image;
-% cla(hAS);
-% h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
 
 hIS = data.Panel.SagitalView.Comp.hPlotObj.IS;
 hIS.CData = IS;
 
-% hPlotObj.IS = imshow(IS, 'DisplayRange',[], 'parent', hAS);
 hIS.XData = image.Info.yy;
-hIS.YData = image.Info.zz;
+hIS.YData = flip(image.Info.zz);
 
 data.Panel.SagitalView.Comp.hPlotObj.zLine.Position = [image.Info.yy(1) image.Info.zz(iP)
                                                                             image.Info.yy(end) image.Info.zz(iP)];
@@ -128,16 +121,13 @@ axis(hAS, 'tight', 'equal')
 
 %% Coronal
 INP = squeeze(image.MM(iM, :, :));
-IC =flip(rot90(INP, 3), 2);
+IC =rot90(INP);
 data.image.CoronalView.iM = iM;
-
-% cla(hAC);
-% h = imshow(IS, RA, 'DisplayRange',[], 'parent', hA);
 
 hIC = data.Panel.CoronalView.Comp.hPlotObj.IC;
 hIC.CData = IC;
 hIC.XData = image.Info.xx;
-hIC.YData = image.Info.zz;
+hIC.YData = flip(image.Info.zz);
 
 data.Panel.CoronalView.Comp.hPlotObj.zLine.Position = [image.Info.xx(1) image.Info.zz(iP)
                                                                             image.Info.xx(end) image.Info.zz(iP)];
