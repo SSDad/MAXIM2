@@ -28,9 +28,12 @@ addToolbar(hFig);
                 
 data.Panel = addPanel(hFig);
 data.Panel.Patient.Comp = addComponents2Panel_Patient(data.Panel.Patient.hPanel);
+data.Panel.D2.Comp = addComponents2Panel_D2(data.Panel.D2.hPanel);
+
 data.Panel.AxialView.Comp = addComponents2Panel_AxialView(data.Panel.AxialView.hPanel);
 data.Panel.SagitalView.Comp = addComponents2Panel_SagitalView(data.Panel.SagitalView.hPanel);
 data.Panel.CoronalView.Comp = addComponents2Panel_CoronalView(data.Panel.CoronalView.hPanel);
+data.Panel.D2View.Comp = addComponents2Panel_D2View(data.Panel.D2View.hPanel);
 
 guidata(hFig, data);
 
