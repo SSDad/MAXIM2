@@ -9,14 +9,22 @@ td = tempdir;
 fd_info = fullfile(td, 'MAXIM2');
 fn_info = fullfile(fd_info, 'infoD2.mat');
 if ~exist(fn_info, 'file')
-    [D2ImageFileName, D2DataPath] = uigetfile();
+    [D2ImageFileName, D2ImageFolder] = uigetfile();
     if D2ImageFileName ~=0
-        save(fn_info, 'D2DataPath');
+        save(fn_info, 'D2ImageFolder');
     end
 else
     load(fn_info);
-    [D2ImageFileName, D2ImageFolder] = uigetfile(D2DataPath);
+    [D2ImageFileName, ~] = uigetfile(D2ImageFolder);
 end
+
+hWB = waitbar(0, 'Loading 2D Slices...');
+
+% Change mouse pointer (cursor) to an hourglass.  
+% QUIRK: use 'watch' and you'll actually get an hourglass not a watch.
+set(hFig,'Pointer','watch');
+drawnow;  % Cursor won't change right away unless you do this.
+
 
 load(fullfile(D2ImageFolder, D2ImageFileName));
 imageD2.Images = imgWrite;
@@ -63,6 +71,13 @@ imageD2.dy = dy;
 imageD2.xx = xx;
 imageD2.yy = yy;
 data.imageD2 = imageD2;
+
+waitbar(100, hWB, 'Loading 2D Slices...');
+pause(1);
+close(hWB)
+% Change mouse pointer (cursor) to an arrow.
+set(hFig,'Pointer','arrow')
+drawnow;  % Cursor won't change right away unless you do this.
 
 guidata(hFig, data);
 
