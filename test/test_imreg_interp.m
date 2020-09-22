@@ -1,4 +1,4 @@
-clear vars
+clearvars
 
 load('testData.mat')
 
@@ -31,9 +31,10 @@ hAS.Visible = 'on';
 
 axis(hAS, 'tight', 'equal')
 
-% scaleS = [dyS/dxy dxS/dxy];
-% IS = imresize(IS, 'Scale', scaleS);
-% IS = im2single(IS);
+scaleS = [dyS/dxy dxS/dxy];
+IS = imresize(IS, 'Scale', scaleS);
+IS = im2single(IS);
+
 
 %% d2
 hAD2 = subplot(1,2,2, 'Parent', hF);
@@ -66,17 +67,22 @@ imshowpair(IS, ID2, 'montage')
 moving = IS;
 fixed = ID2;
 
-tformEstimate = imregcorr(moving, fixed);
-Rfixed = imref2d(size(fixed));
-movingReg = imwarp(moving,tformEstimate,'OutputView',Rfixed);
-figure(3)
-imshowpair(fixed,movingReg,'montage');
+[optimizer,metric] = imregconfig('multimodal');
+tform = imregtform(moving, fixed, 'affine', optimizer, metric);
+mr = imwarp(moving,tform,'OutputView',imref2d(size(fixed)));
 
+% optimizer.InitialRadius = optimizer.InitialRadius/4;
+% [mr, R] = imregister(moving,fixed,'affine',optimizer,metric);
 
-% [optimizer,metric] = imregconfig('multimodal');
-% % optimizer.InitialRadius = optimizer.InitialRadius/4;
-% mr = imregister(moving,fixed,'affine',optimizer,metric);
-% 
-% figure(3)
-% imshowpair(mr, fixed)
-% title('A: Default Registration')
+figure(3), clf
+imshowpair(mr, fixed, 'Montage')
+
+% optimize
+optimizer.InitialRadius = optimizer.InitialRadius/3.5;
+tform2 = imregtform(moving, fixed, 'affine', optimizer, metric);
+mr2 = imwarp(moving,tform2,'OutputView',imref2d(size(fixed)));
+
+% [mr2, R2] = imregister(moving,fixed,'affine',optimizer,metric);
+
+figure(4), clf
+imshowpair(mr2, fixed, 'Montage')
