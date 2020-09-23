@@ -30,14 +30,14 @@ hIS = imshow([], 'Parent', hAS);
 hIS.CData = IS;
 
 xxS = img.Info.yy; 
-yyS = img.Info.zz; 
+yyS = flip(img.Info.zz); 
 hIS.XData = xxS;
 hIS.YData = yyS;
                
 hAS.CLim = [min(IS(:)) max(IS(:))];
 hAS.XColor = 'g';
 hAS.YColor = 'b';
-hAS.YDir = 'normal';
+% hAS.YDir = 'normal';
 hAS.Visible = 'on';
 
 axis(hAS, 'tight', 'equal')
@@ -49,13 +49,12 @@ hID2 = imshow([], 'Parent', hAD2);
 ID2 = rgb2gray(d2.I);
 
 hID2.CData = ID2;
-hID2.XData =d2.xx;
-d2.yy = flip(d2.yy);
-hID2.YData = d2.yy; 
+hID2.XData =d2.xx;  
+hID2.YData = flip(d2.yy); 
 
 hAD2.CLim = [min(ID2(:)) max(ID2(:))];
 
-hAD2.YDir = 'normal';
+% hAD2.YDir = 'normal';
 hAD2.XColor = 'g';
 hAD2.YColor = 'b';
 
