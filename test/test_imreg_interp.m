@@ -2,8 +2,6 @@ clearvars
 
 load('testData.mat')
 
-dxy = 1;
-
 %% Sagital
 [M, N, P] = size(img.MM);
 iN = round(N/2);
@@ -11,9 +9,31 @@ iN = round(N/2);
 IMP = squeeze(img.MM(:,iN, :));
 IS = rot90(IMP);
 
-hF = figure(1);
-hF.Color = 'k';
-hAS = subplot(1,2,1, 'Parent', hF);
+%% figure on second monitor if available
+figPosShft = [0 0]; 
+MP = get(0, 'MonitorPositions');
+if size(MP, 1) == 2  % Dual monitor
+    figPosShft    = MP(2, 1:2);
+    sizeF = MP(2, 3:4)/2;
+    origF = MP(2, 3:4)/4;
+    posF = [origF+figPosShft sizeF];
+end
+
+%   FigH     = figure(varargin{:}, 'Visible', 'off');
+%   drawnow;
+%   set(FigH, 'Units', 'pixels');
+%   pos      = get(FigH, 'Position');
+%   pause(0.02);  % See Stefan Glasauer's comment
+%   set(FigH, 'Position', [pos(1:2) + Shift, pos(3:4)], ...
+%             'Visible', paramVisible);
+% 
+
+
+hF(1) = figure(1);
+hF(1).Position = posF;
+
+hF(1).Color = 'k';
+hAS = subplot(1,2,1, 'Parent', hF(1));
 hIS = imshow([], 'Parent', hAS);
 
 hIS.CData = IS;
@@ -30,11 +50,6 @@ hAS.YColor = 'b';
 hAS.Visible = 'on';
 
 axis(hAS, 'tight', 'equal')
-
-scaleS = [dyS/dxy dxS/dxy];
-IS = imresize(IS, 'Scale', scaleS);
-IS = im2single(IS);
-
 
 %% d2
 hAD2 = subplot(1,2,2, 'Parent', hF);
@@ -55,12 +70,21 @@ hAD2.YColor = 'b';
 axis(hAD2, 'tight', 'equal')
 hAD2.Visible = 'on';
 
+%% scale
+
+dxy = min([dxS dyS dx2 dy2]);
+
+scaleS = [dyS/dxy dxS/dxy];
+IS = imresize(IS, 'Scale', scaleS);
+IS = im2single(IS);
+
 scale2 = [dy2/dxy dx2/dxy];
 ID2 = imresize(ID2, 'Scale', scale2);
 ID2 = im2single(ID2);
 
-figure(2)
+hF(2) = figure(2); clf
 imshowpair(IS, ID2, 'montage')
+hF(2).Position = posF;
 
 
 %% reg
@@ -74,9 +98,6 @@ mr = imwarp(moving,tform,'OutputView',imref2d(size(fixed)));
 % optimizer.InitialRadius = optimizer.InitialRadius/4;
 % [mr, R] = imregister(moving,fixed,'affine',optimizer,metric);
 
-figure(3), clf
-imshowpair(mr, fixed, 'Montage')
-
 % optimize
 optimizer.InitialRadius = optimizer.InitialRadius/3.5;
 tform2 = imregtform(moving, fixed, 'affine', optimizer, metric);
@@ -84,5 +105,10 @@ mr2 = imwarp(moving,tform2,'OutputView',imref2d(size(fixed)));
 
 % [mr2, R2] = imregister(moving,fixed,'affine',optimizer,metric);
 
-figure(4), clf
+hF(3) = figure(3); clf
+imshowpair(mr2, fixed)
+hF(3).Position = posF;
+
+hF(4) = figure(4); clf
 imshowpair(mr2, fixed, 'Montage')
+hF(4).Position = posF;
