@@ -2,9 +2,9 @@ function [fixed, mvr, tform, scalef, scalem] = fun_imgreg(fixed, xxf, yyf, movin
 
 %% scale
 dxf = xxf(2)-xxf(1); 
-dyf = yyf(2)-yyf(1);
+dyf = abs(yyf(2)-yyf(1));
 dxm = xxm(2)-xxm(1);
-dym = yym(2)-yym(1);
+dym = abs(yym(2)-yym(1));
 dxy = min([dxf dyf dxm dym]);
 
 scalem = [dym/dxy dxm/dxy];

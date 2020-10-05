@@ -1,5 +1,4 @@
 clearvars
-close all
 
 load('testData.mat')
 xxS = img.Info.yy; 
@@ -7,7 +6,7 @@ yyS = flip(img.Info.zz);
 
 ID2 = rgb2gray(d2.I);
 
-%% Sagital
+%% Sagital max N
 [M, N, P] = size(img.MM);
 
 ffn = 'maxN.mat';
@@ -47,7 +46,7 @@ if size(MP, 1) == 2  % Dual monitor
     posF = [origF+figPosShft sizeF];
 end
 
-hF = figure;
+hF = figure(101);
 hF.Position = posF;
 plot(ssimval, 'o');
 
@@ -55,27 +54,26 @@ plot(ssimval, 'o');
 IMP = squeeze(img.MM(:,idx, :));
 IS = rot90(IMP);
 
-%% plot
-hF = figure;
+% plot
+hF = figure(102); clf;
 hF.Position = posF;
 
 hF.Color = 'k';
 hAS = subplot(1,2,1, 'Parent', hF);
 hIS = imshow([], 'Parent', hAS);
-
 hIS.CData = IS;
 
-xxS = img.Info.yy; 
-yyS = img.Info.zz; 
+% xxS = img.Info.yy; 
+% yyS = img.Info.zz; 
 hIS.XData = xxS;
 hIS.YData = yyS;
                
 hAS.CLim = [min(IS(:)) max(IS(:))];
 hAS.XColor = 'g';
 hAS.YColor = 'b';
-hAS.YDir = 'normal';
 hAS.Visible = 'on';
 
+hAS.YDir = 'normal';
 axis(hAS, 'tight', 'equal')
 
 %% d2
@@ -83,9 +81,8 @@ hAD2 = subplot(1,2,2, 'Parent', hF);
 hID2 = imshow([], 'Parent', hAD2);
 
 % hID2.CData = ID2;
-hID2.CData = d2.I;
+hID2.CData = d2.I;  % rgb image
 hID2.XData =d2.xx;  
-d2.yy = flip(d2.yy);
 hID2.YData = d2.yy; 
 
 % hAD2.CLim = [min(ID2(:)) max(ID2(:))];
@@ -109,21 +106,21 @@ line(hAD2, 'XData', xxC, 'YData', yyC, 'Color', 'c', 'LineWidth', 2);
 ID2 = rgb2gray(d2.I);
 [fixed, mvr, tform, scalef, scalem] = fun_imgreg(ID2, d2.xx, d2.yy, IS, xxS, yyS);
 
-hF = figure; clf
+hF = figure(103); clf
 imshowpair(mvr, fixed)
 hF.Position = posF;
 
-hF = figure; clf
+hF = figure(104); clf
 hAm = subplot(1,2,1); imshow(mvr, [], 'parent', hAm)
 hAf = subplot(1,2,2); imshow(fixed, [], 'parent', hAf)
 % imshowpair(mvr, fixed, 'Montage')
 hF.Position = posF;
 
-%% burn
 C1 = [C(:,1)*scalef(2) C(:,2)*scalef(1)];
 line(hAf, 'XData', C1(:,1), 'YData', C1(:,2), 'Color', 'c', 'LineWidth', 2);
 line(hAm, 'XData', C1(:,1), 'YData', C1(:,2), 'Color', 'c', 'LineWidth', 2);
 
+%% burn
 [u, v] = transformPointsInverse(tform, C1(:, 1), C1(:,2));
 
 moving = IS;
@@ -136,14 +133,18 @@ moving = moving/max(moving(:));
 % iT = itform.T;
 % C2 = iT(1:2, 1:2)*(C1+iT(3, 1:2))';
 % C2 = C2';
-hF = figure; clf
-imshow(moving, []), hold on
+hF = figure(105); clf
+hI = imshow(moving, []); hold on
+% hI.XData =d2.xx;  
+% hI.YData = d2.yy; 
+
 line('XData', u, 'YData', v, 'Color', 'c', 'LineWidth', 2);
-set(gca, 'YDir', 'Normal')
 hF.Position = posF;
+
 axis on
 
-% back to original
+
+%% back to original
 u = u/scalem(2);
 v = v/scalem(1);
 
