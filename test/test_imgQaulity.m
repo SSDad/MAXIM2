@@ -120,7 +120,7 @@ C1 = [C(:,1)*scalef(2) C(:,2)*scalef(1)];
 line(hAf, 'XData', C1(:,1), 'YData', C1(:,2), 'Color', 'c', 'LineWidth', 2);
 line(hAm, 'XData', C1(:,1), 'YData', C1(:,2), 'Color', 'c', 'LineWidth', 2);
 
-%% burn
+%% scale back
 [u, v] = transformPointsInverse(tform, C1(:, 1), C1(:,2));
 
 moving = IS;
@@ -140,9 +140,7 @@ hI = imshow(moving, []); hold on
 
 line('XData', u, 'YData', v, 'Color', 'c', 'LineWidth', 2);
 hF.Position = posF;
-
 axis on
-
 
 %% back to original
 u = u/scalem(2);
@@ -154,3 +152,22 @@ xxC = (u-1)*dx+xxS(1);
 yyC = (v-1)*dy+yyS(1);
 line(hAS, 'XData', xxC, 'YData', yyC, 'Color', 'c', 'LineWidth', 2);
 
+%% burn
+hF = figure(106); clf
+hA1 = subplot(211, 'parent', hF);
+hI = imshow(IS, [], 'parent', hA1); hold on
+
+line(hA1, 'XData', u, 'YData', v, 'Color', 'c', 'LineWidth', 2);
+hF.Position = posF;
+axis on
+
+ISb = IS;
+ind = sub2ind(size(ISb), round(v), round(u));
+ISb(ind) = intmax(class(IS));
+hA2 = subplot(212, 'parent', hF);
+hI = imshow(ISb, [], 'parent', hA2); hold on
+hA2.CLim = [min(IS(:)) max(IS(:))];
+axis on
+line(hA2, 'XData', u, 'YData', v, 'Color', 'c', 'LineWidth', 2);
+
+linkaxes([hA1, hA2])
