@@ -47,6 +47,9 @@ if size(MP, 1) == 2  % Dual monitor
 end
 
 hF = figure(101);
+if size(MP, 1) == 1  % Dual monitor
+    posF = hF.Position;
+end
 hF.Position = posF;
 plot(ssimval, 'o');
 
